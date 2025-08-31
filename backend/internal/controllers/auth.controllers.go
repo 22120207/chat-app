@@ -3,6 +3,7 @@ package controllers
 import (
 	"chat-app-backend/internal/helpers"
 	"chat-app-backend/internal/models"
+	"errors"
 	"log"
 	"net/http"
 	"time"
@@ -27,7 +28,7 @@ func AuthSignup(c *gin.Context) {
 	}
 
 	var user models.User
-	err := Client.FindOne(string(UserCollection), bson.M{
+	err := Client.FindOne(models.UsersCollection, bson.M{
 		"username": json.Username,
 	}).Decode(&user)
 
@@ -44,7 +45,7 @@ func AuthSignup(c *gin.Context) {
 
 	hashPassword, err := helpers.HashPassword(json.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.Error(errors.New(string(models.InternalServerError)))
 		return
 	}
 
@@ -58,16 +59,17 @@ func AuthSignup(c *gin.Context) {
 		UpdatedAt:  time.Now(),
 	}
 
-	result, err := Client.InsertOne(string(UserCollection), newUser)
+	result, err := Client.InsertOne(models.UsersCollection, newUser)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		log.Printf("Error in insert document: %v", err)
+		c.Error(errors.New(string(models.InternalServerError)))
 		return
 	}
 
 	// Create Token
-	err = helpers.CreateToken(c, result.InsertedID.(string), conf.JwtSecret)
+	err = helpers.CreateToken(c, newUser, conf.JwtSecret)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.Error(errors.New(string(models.InternalServerError)))
 		return
 	}
 
@@ -87,7 +89,7 @@ func AuthLogin(c *gin.Context) {
 	}
 
 	var user models.User
-	err := Client.FindOne(string(UserCollection), bson.M{
+	err := Client.FindOne(models.UsersCollection, bson.M{
 		"username": json.Username,
 	}).Decode(&user)
 
@@ -108,9 +110,9 @@ func AuthLogin(c *gin.Context) {
 	}
 
 	// Create Token
-	err = helpers.CreateToken(c, user.ID.Hex(), conf.JwtSecret)
+	err = helpers.CreateToken(c, user, conf.JwtSecret)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+		c.Error(errors.New(string(models.InternalServerError)))
 		return
 	}
 
@@ -126,29 +128,4 @@ func AuthLogout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Logout successfully",
 	})
-}
-
-func AuthMiddleware(c *gin.Context) {
-	// Retrieve the token from the cookie
-	tokenString, err := c.Cookie("token")
-	if err != nil {
-		log.Printf("Token missing in cookie: %v", err)
-		c.Abort()
-		return
-	}
-
-	// Verify the token
-	_, claims, err := helpers.VerifyToken(tokenString, conf.JwtSecret)
-	if err != nil {
-		log.Printf("Token verification failed: %v", err)
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	userID := claims["sub"].(string)
-
-	c.Set("userID", userID)
-
-	// Continue with the next middleware or route handler
-	c.Next()
 }

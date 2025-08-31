@@ -11,13 +11,14 @@ import (
 type Config struct {
 	MongodbUri string
 	JwtSecret  string
+	Database   string
 }
 
-var conf Config
+var Conf Config
 
 var once sync.Once
 
-func LoadEnv() Config {
+func LoadEnv() {
 	once.Do(func() {
 		err := godotenv.Load(`E:\Project\chat-app\backend\.env`)
 		if err != nil {
@@ -26,10 +27,10 @@ func LoadEnv() Config {
 
 		mongodbUri := os.Getenv("MONGODB_URI")
 		jwtSecret := os.Getenv("JWT_SECRET")
+		database := os.Getenv("DATABASE")
 
-		conf.MongodbUri = mongodbUri
-		conf.JwtSecret = jwtSecret
+		Conf.MongodbUri = mongodbUri
+		Conf.JwtSecret = jwtSecret
+		Conf.Database = database
 	})
-
-	return conf
 }

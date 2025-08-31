@@ -1,6 +1,7 @@
 package mongodb
 
 import (
+	"chat-app-backend/internal/models"
 	"context"
 	"fmt"
 	"log"
@@ -10,27 +11,27 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-type Collection string
-
 type Client struct {
-	Context        context.Context
-	Database       *mongo.Database
-	UserCollection *mongo.Collection
-	client         *mongo.Client
+	Context                 context.Context
+	Database                *mongo.Database
+	UsersCollection         *mongo.Collection
+	MessagesCollection      *mongo.Collection
+	ConversationsCollection *mongo.Collection
+	client                  *mongo.Client
 }
 
-func (c *Client) ConnectToDB(uri string) {
+func (c *Client) ConnectToDB(uri, database string) {
 	if uri == "" {
 		log.Fatal("You must set your 'MONGODB_URI' environment variable.")
 	}
 
-	// Uses the SetServerAPIOptions() method to set the Stable API version to 1
+	// Set the Stable API version to 1
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 
 	// Defines the options for the MongoDB client
 	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
 
-	// Creates a new client and connects to the server
+	// Connects to the server
 	client, err := mongo.Connect(opts)
 	if err != nil {
 		panic(err)
@@ -38,30 +39,41 @@ func (c *Client) ConnectToDB(uri string) {
 
 	// Sends a ping to confirm a successful connection
 	var result bson.M
-	if err := client.Database("chat_app").RunCommand(context.TODO(), bson.D{{Key: "ping", Value: 1}}).Decode(&result); err != nil {
+	if err := client.Database(database).RunCommand(context.TODO(), bson.D{{Key: "ping", Value: 1}}).Decode(&result); err != nil {
 		panic(err)
 	}
 	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
 
 	c.Context = context.Background()
 	c.client = client
-	c.Database = client.Database("chat_app")
-	c.UserCollection = c.Database.Collection("users")
+	c.Database = client.Database(database)
+
+	c.UsersCollection = c.Database.Collection(string(models.UsersCollection))
+	c.MessagesCollection = c.Database.Collection(string(models.MessagesCollection))
+	c.ConversationsCollection = c.Database.Collection(string(models.ConversationsCollection))
 }
 
-func (c *Client) FindOne(collection string, filter any) *mongo.SingleResult {
+func (c *Client) FindOne(collection models.Collection, filter any) *mongo.SingleResult {
 	switch collection {
-	case "users":
-		return c.UserCollection.FindOne(c.Context, filter)
+	case models.UsersCollection:
+		return c.UsersCollection.FindOne(c.Context, filter)
+	case models.MessagesCollection:
+		return c.MessagesCollection.FindOne(c.Context, filter)
+	case models.ConversationsCollection:
+		return c.ConversationsCollection.FindOne(c.Context, filter)
 	default:
 		return nil
 	}
 }
 
-func (c *Client) InsertOne(collection string, document any) (*mongo.InsertOneResult, error) {
+func (c *Client) InsertOne(collection models.Collection, document any) (*mongo.InsertOneResult, error) {
 	switch collection {
-	case "users":
-		return c.UserCollection.InsertOne(c.Context, document)
+	case models.UsersCollection:
+		return c.UsersCollection.InsertOne(c.Context, document)
+	case models.MessagesCollection:
+		return c.MessagesCollection.InsertOne(c.Context, document)
+	case models.ConversationsCollection:
+		return c.ConversationsCollection.InsertOne(c.Context, document)
 	default:
 		return nil, fmt.Errorf("unknown collection: %s", collection)
 	}

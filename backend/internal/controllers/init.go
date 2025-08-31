@@ -5,18 +5,14 @@ import (
 	"chat-app-backend/internal/mongodb"
 )
 
-type Collection string
-
-const (
-	UserCollection Collection = "users"
-)
-
 var Client mongodb.Client
 
 var conf config.Config
 
 func init() {
-	conf = config.LoadEnv()
+	config.LoadEnv()
 
-	Client.ConnectToDB(conf.MongodbUri)
+	conf = config.Conf
+
+	Client.ConnectToDB(conf.MongodbUri, conf.Database)
 }

@@ -1,21 +1,22 @@
 package controllers
 
 import (
+	"chat-app-backend/internal/models"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func SendMessage(c *gin.Context) {
-	userID, exists := c.Get("userID")
+	user, exists := c.Get("user")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		c.Error(errors.New(string(models.UnauthorizedError)))
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Send messages successfully",
-		"paramID": c.Param("id"),
-		"userID":  userID,
+		"user":    user.(models.User),
 	})
 }

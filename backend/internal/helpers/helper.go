@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"chat-app-backend/internal/models"
 	"fmt"
 	"log"
 	"strings"
@@ -26,10 +27,10 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func CreateToken(c *gin.Context, userID, secretKey string) error {
+func CreateToken(c *gin.Context, user models.User, secretKey string) error {
 	// Create a new JWT token with claims
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": userID,                               // Subject (user identifier)
+		"sub": user.ID,                              // Subject (user identifier)
 		"iss": "chat-app",                           // Issuer
 		"exp": time.Now().Add(8 * time.Hour).Unix(), // Expiration time
 		"iat": time.Now().Unix(),                    // Issued at

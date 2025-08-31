@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"chat-app-backend/internal/middleware"
+
 	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +17,8 @@ func SetupRouter() *gin.Engine {
 
 	// Add a logger middleware, which logs all requests, like a combined access and error log
 	r.Use(logger.SetLogger())
+
+	r.Use(middleware.ErrorHandlerMiddleware())
 
 	r.Use(func(c *gin.Context) {
 
