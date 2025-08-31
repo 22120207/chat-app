@@ -5,6 +5,7 @@ import (
 	"chat-app-backend/internal/models"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -53,6 +54,8 @@ func AuthSignup(c *gin.Context) {
 		Password:   hashPassword,
 		Gender:     json.Gender,
 		ProfilePic: profilePic,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 
 	result, err := Client.InsertOne(string(UserCollection), newUser)
@@ -62,7 +65,7 @@ func AuthSignup(c *gin.Context) {
 	}
 
 	// Create Token
-	err = helpers.CreateToken(c, json.Username, conf.JwtSecret)
+	err = helpers.CreateToken(c, result.InsertedID.(string), conf.JwtSecret)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
@@ -105,7 +108,7 @@ func AuthLogin(c *gin.Context) {
 	}
 
 	// Create Token
-	err = helpers.CreateToken(c, json.Username, conf.JwtSecret)
+	err = helpers.CreateToken(c, user.ID.Hex(), conf.JwtSecret)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
 		return
@@ -135,12 +138,16 @@ func AuthMiddleware(c *gin.Context) {
 	}
 
 	// Verify the token
-	err = helpers.VerifyToken(tokenString, conf.JwtSecret)
+	_, claims, err := helpers.VerifyToken(tokenString, conf.JwtSecret)
 	if err != nil {
-		log.Printf("Token verification failed: %v\\n", err)
-		c.Abort()
+		log.Printf("Token verification failed: %v", err)
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
+
+	userID := claims["sub"].(string)
+
+	c.Set("userID", userID)
 
 	// Continue with the next middleware or route handler
 	c.Next()

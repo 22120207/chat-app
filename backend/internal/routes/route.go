@@ -38,6 +38,7 @@ func SetupRouter() *gin.Engine {
 	}
 
 	api.setUpAuthRoutes()
+	api.setUpMessagesRoutes()
 
 	return r
 }

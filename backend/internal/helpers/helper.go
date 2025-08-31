@@ -26,10 +26,10 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func CreateToken(c *gin.Context, username, secretKey string) error {
+func CreateToken(c *gin.Context, userID, secretKey string) error {
 	// Create a new JWT token with claims
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": username,                             // Subject (user identifier)
+		"sub": userID,                               // Subject (user identifier)
 		"iss": "chat-app",                           // Issuer
 		"exp": time.Now().Add(8 * time.Hour).Unix(), // Expiration time
 		"iat": time.Now().Unix(),                    // Issued at
@@ -47,19 +47,19 @@ func CreateToken(c *gin.Context, username, secretKey string) error {
 }
 
 // Function to verify JWT tokens
-func VerifyToken(tokenString, secretKey string) error {
-	// Parse the token with the secret key
+func VerifyToken(tokenString string, secretKey string) (*jwt.Token, jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return secretKey, nil
+		return []byte(secretKey), nil
 	})
-	if err != nil {
-		log.Printf("Error in parse jwt token: %v", err)
-		return err
+
+	if err != nil || !token.Valid {
+		return nil, nil, fmt.Errorf("invalid token: %w", err)
 	}
 
-	if !token.Valid {
-		return fmt.Errorf("invalid token")
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, nil, fmt.Errorf("cannot parse claims")
 	}
 
-	return nil
+	return token, claims, nil
 }
