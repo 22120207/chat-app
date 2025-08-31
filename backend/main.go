@@ -1,14 +1,12 @@
 package main
 
 import (
-	"chat-app-backend/internal/config"
 	"chat-app-backend/internal/routes"
 	"log"
 )
 
 func main() {
-	config.LoadEnv()
-
+	// Setup Router
 	r := routes.SetupRouter()
 
 	if err := r.Run(":5000"); err != nil {

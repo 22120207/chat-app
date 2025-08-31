@@ -5,5 +5,8 @@ import (
 )
 
 func (api *Routes) setUpAuthRoutes() {
-	api.routerGroup.POST("/auth", controllers.AuthSignup)
+	apiAuth := api.routerGroup.Group("/auth")
+	apiAuth.POST("/signup", controllers.AuthSignup)
+	apiAuth.POST("/login", controllers.AuthLogin)
+	apiAuth.POST("/logout", controllers.AuthLogout)
 }
