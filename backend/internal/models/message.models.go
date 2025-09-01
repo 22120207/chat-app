@@ -14,3 +14,7 @@ type Message struct {
 	CreatedAt  time.Time     `bson:"createdAt"`
 	UpdatedAt  time.Time     `bson:"updatedAt"`
 }
+
+type MessageRequest struct {
+	Message string `json:"message" binding:"required"`
+}

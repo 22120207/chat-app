@@ -43,6 +43,7 @@ func SetupRouter() *gin.Engine {
 
 	api.setUpAuthRoutes()
 	api.setUpMessagesRoutes()
+	api.setUpUsersRoutes()
 
 	return r
 }

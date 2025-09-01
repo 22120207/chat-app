@@ -34,7 +34,7 @@ func AuthSignup(c *gin.Context) {
 
 	if err != nil {
 		if err != mongo.ErrNoDocuments {
-			log.Panic(err)
+			c.Error(errors.New(string(models.InternalServerError)))
 		}
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Username must be unique"})
@@ -50,6 +50,7 @@ func AuthSignup(c *gin.Context) {
 	}
 
 	newUser := models.User{
+		ID:         bson.NewObjectID(),
 		Fullname:   json.Fullname,
 		Username:   json.Username,
 		Password:   hashPassword,
@@ -61,7 +62,6 @@ func AuthSignup(c *gin.Context) {
 
 	result, err := Client.InsertOne(models.UsersCollection, newUser)
 	if err != nil {
-		log.Printf("Error in insert document: %v", err)
 		c.Error(errors.New(string(models.InternalServerError)))
 		return
 	}

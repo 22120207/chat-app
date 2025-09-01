@@ -8,8 +8,8 @@ import (
 
 type Conversation struct {
 	ID           bson.ObjectID   `bson:"_id,omitempty"`
-	Participants []bson.ObjectID `bson:"_id" binding:"required"`
-	Messages     []Message       `bson:"messages" binding:"required"`
+	Participants []bson.ObjectID `bson:"participants" binding:"required"`
+	Messages     []bson.ObjectID `bson:"messages" binding:"required"`
 	CreatedAt    time.Time       `bson:"createdAt"`
 	UpdatedAt    time.Time       `bson:"updatedAt"`
 }

@@ -8,4 +8,5 @@ import (
 func (api *Routes) setUpMessagesRoutes() {
 	apiAuth := api.routerGroup.Group("/messages")
 	apiAuth.POST("/send/:id", middleware.AuthMiddleware, controllers.SendMessage)
+	apiAuth.GET("/:id", middleware.AuthMiddleware, controllers.GetMessage)
 }

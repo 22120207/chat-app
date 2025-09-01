@@ -12,12 +12,9 @@ import (
 )
 
 type Client struct {
-	Context                 context.Context
-	Database                *mongo.Database
-	UsersCollection         *mongo.Collection
-	MessagesCollection      *mongo.Collection
-	ConversationsCollection *mongo.Collection
-	client                  *mongo.Client
+	Context  context.Context
+	Database *mongo.Database
+	client   *mongo.Client
 }
 
 func (c *Client) ConnectToDB(uri, database string) {
@@ -47,36 +44,26 @@ func (c *Client) ConnectToDB(uri, database string) {
 	c.Context = context.Background()
 	c.client = client
 	c.Database = client.Database(database)
-
-	c.UsersCollection = c.Database.Collection(string(models.UsersCollection))
-	c.MessagesCollection = c.Database.Collection(string(models.MessagesCollection))
-	c.ConversationsCollection = c.Database.Collection(string(models.ConversationsCollection))
 }
 
 func (c *Client) FindOne(collection models.Collection, filter any) *mongo.SingleResult {
-	switch collection {
-	case models.UsersCollection:
-		return c.UsersCollection.FindOne(c.Context, filter)
-	case models.MessagesCollection:
-		return c.MessagesCollection.FindOne(c.Context, filter)
-	case models.ConversationsCollection:
-		return c.ConversationsCollection.FindOne(c.Context, filter)
-	default:
-		return nil
-	}
+	coll := c.Database.Collection(string(collection))
+	return coll.FindOne(c.Context, filter)
+}
+
+func (c *Client) Find(collection models.Collection, filter any) (*mongo.Cursor, error) {
+	coll := c.Database.Collection(string(collection))
+	return coll.Find(c.Context, filter)
 }
 
 func (c *Client) InsertOne(collection models.Collection, document any) (*mongo.InsertOneResult, error) {
-	switch collection {
-	case models.UsersCollection:
-		return c.UsersCollection.InsertOne(c.Context, document)
-	case models.MessagesCollection:
-		return c.MessagesCollection.InsertOne(c.Context, document)
-	case models.ConversationsCollection:
-		return c.ConversationsCollection.InsertOne(c.Context, document)
-	default:
-		return nil, fmt.Errorf("unknown collection: %s", collection)
-	}
+	coll := c.Database.Collection(string(collection))
+	return coll.InsertOne(c.Context, document)
+}
+
+func (c *Client) UpdateOne(collection models.Collection, filter any, update any) (*mongo.UpdateResult, error) {
+	coll := c.Database.Collection(string(collection))
+	return coll.UpdateOne(c.Context, filter, update)
 }
 
 func (c *Client) Disconnect() {

@@ -12,9 +12,10 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-var conf = config.Conf
-
 func AuthMiddleware(c *gin.Context) {
+	config.LoadEnv()
+	conf := config.Conf
+
 	// Retrieve the token from the cookie
 	tokenString, err := c.Cookie("token")
 	if err != nil {
@@ -26,20 +27,24 @@ func AuthMiddleware(c *gin.Context) {
 	// Verify the token
 	_, claims, err := helpers.VerifyToken(tokenString, conf.JwtSecret)
 	if err != nil {
-		log.Printf("Token verification failed: %v", err)
 		c.Error(errors.New(string(models.UnauthorizedError)))
 		return
 	}
 
 	userId := claims["sub"]
 
+	objectID, err := bson.ObjectIDFromHex(userId.(string))
+	if err != nil {
+		c.Error(errors.New(string(models.InternalServerError)))
+		return
+	}
+
 	var user models.User
 	err = controllers.Client.FindOne(models.UsersCollection, bson.M{
-		"_id": userId,
+		"_id": objectID,
 	}).Decode(&user)
 
 	if err != nil {
-		log.Printf("Error in find user %v", err)
 		c.Error(errors.New(string(models.UnauthorizedError)))
 		return
 	}
