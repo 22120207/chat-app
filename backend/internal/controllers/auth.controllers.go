@@ -129,3 +129,15 @@ func AuthLogout(c *gin.Context) {
 		"message": "Logout successfully",
 	})
 }
+
+func AuthCheck(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.Error(errors.New(string(models.UnauthorizedError)))
+		return
+	}
+
+	authUser := user.(models.User)
+
+	c.JSON(http.StatusOK, authUser)
+}

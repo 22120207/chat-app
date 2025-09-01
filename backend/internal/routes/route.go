@@ -21,20 +21,24 @@ func SetupRouter() *gin.Engine {
 	r.Use(middleware.ErrorHandlerMiddleware())
 
 	r.Use(func(c *gin.Context) {
+		origin := "http://localhost:5173"
+
+		// CORS
+		c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 
 		// Set HTTP response headers for all requests
 		c.Writer.Header().Set("Content-Type", "application/json")
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		c.Writer.Header().Set("Access-Control-Max-Age", "86400")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, UPDATE")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, X-Max")
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(200)
-		} else {
-			c.Next()
+			return
 		}
+
+		c.Next()
 	})
 
 	api := Routes{
