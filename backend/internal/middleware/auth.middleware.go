@@ -20,6 +20,7 @@ func AuthMiddleware(c *gin.Context) {
 	tokenString, err := c.Cookie("token")
 	if err != nil {
 		log.Printf("Token missing in cookie: %v", err)
+		c.Error(errors.New(string(models.UnauthorizedError)))
 		c.Abort()
 		return
 	}
