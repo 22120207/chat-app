@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useAuthStore } from "../store/useAuthStore";
+import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 import {
   Eye,
   EyeOff,
@@ -7,12 +8,10 @@ import {
   KeyRound,
   MessageSquare,
   User,
-  VenusAndMars,
 } from "lucide-react";
-import { Link } from "react-router-dom";
 
+import { useAuthStore } from "../store/useAuthStore";
 import AuthImagePattern from "../components/AuthImagePattern";
-import toast from "react-hot-toast";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -53,8 +52,8 @@ const SignUpPage = () => {
   return (
     <div className="min-h-screen grid lg:grid-cols-2 sm:grid-cols-1 select-none">
       {/* Left side */}
-      <div className="flex flex-col justify-center items-center">
-        <div className="w-full max-w-md space-y-8">
+      <div className="flex flex-col justify-center items-center mt-10">
+        <div className="w-full max-w-md space-y-8 bg-base-200 rounded-2xl py-5 px-7">
           {/* Logo */}
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2">
@@ -65,7 +64,7 @@ const SignUpPage = () => {
                 <MessageSquare className="size-6 text-primary" />
               </div>
               <h1 className="text-2xl font-bold">Create Account</h1>
-              <p className="text-base-content/60">
+              <p className="text-base-content/60 text-sm">
                 Get started with your free account
               </p>
             </div>
@@ -75,7 +74,7 @@ const SignUpPage = () => {
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-8">
               {/* Fullname Input */}
-              <label class="input w-full">
+              <label className="input w-full">
                 <input
                   id="fullname"
                   type="text"
@@ -88,7 +87,7 @@ const SignUpPage = () => {
               </label>
 
               {/* Username Input */}
-              <label class="input w-full">
+              <label className="input w-full">
                 <User className="size-5 text-base-content/60" />
                 <input
                   type="text"
@@ -101,7 +100,7 @@ const SignUpPage = () => {
               </label>
 
               {/* Password Input */}
-              <label class="input w-full">
+              <label className="input w-full">
                 <KeyRound className="size-5 text-base-content/60" />
                 <input
                   type={showPassword ? "" : "password"}
@@ -113,6 +112,7 @@ const SignUpPage = () => {
                 />
                 <button
                   type="button"
+                  tabIndex={-1}
                   className="hover:text-base-content"
                   onClick={() => {
                     setShowPassword(!showPassword);
@@ -127,7 +127,7 @@ const SignUpPage = () => {
               </label>
 
               {/* Confirm password Input */}
-              <label class="input w-full">
+              <label className="input w-full">
                 <KeyRound className="size-5 text-base-content/60" />
                 <input
                   type={showPassword ? "" : "password"}
@@ -142,6 +142,7 @@ const SignUpPage = () => {
                 />
                 <button
                   type="button"
+                  tabIndex={-1}
                   className="hover:text-base-content"
                   onClick={() => {
                     setShowPassword(!showPassword);
@@ -178,7 +179,7 @@ const SignUpPage = () => {
               {isSigningUp ? (
                 <>
                   {" "}
-                  <Loader2 />
+                  <Loader2 className="animate-spin" />
                   Loading...
                 </>
               ) : (
@@ -187,7 +188,7 @@ const SignUpPage = () => {
             </button>
 
             {/* Link to Login */}
-            <p className="text-center text-base-content/60">
+            <p className="text-center text-base-content/60 mt-0.5">
               Already have an account?{" "}
               <Link className="link link-primary" to="/login">
                 Sign In
