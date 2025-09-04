@@ -94,11 +94,7 @@ func SendMessage(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
-		"message":    "Send messages successfully",
-		"senderId":   sender.ID.Hex(),
-		"receiverId": c.Param("id"),
-	})
+	c.JSON(http.StatusCreated, newMessage)
 }
 
 // Get all messages of the person that the user chat with
@@ -123,6 +119,11 @@ func GetMessage(c *gin.Context) {
 		"participants": bson.M{"$all": []bson.ObjectID{sender.ID, receiverObjID}},
 	}).Decode(&conversation)
 
+	if err == mongo.ErrNoDocuments {
+		c.JSON(http.StatusOK, gin.H{})
+		return
+	}
+
 	if err != nil {
 		c.Error(errors.New(string(models.InternalServerError)))
 		return
@@ -143,8 +144,5 @@ func GetMessage(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"conversationId": conversation.ID.Hex(),
-		"messages":       messages,
-	})
+	c.JSON(http.StatusOK, messages)
 }

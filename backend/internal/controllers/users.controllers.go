@@ -34,8 +34,5 @@ func GetUsers(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"loggedInUserId": loggedInUser.ID.Hex(),
-		"otherUsers":     otherUsers,
-	})
+	c.JSON(http.StatusOK, otherUsers)
 }

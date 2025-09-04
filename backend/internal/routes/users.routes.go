@@ -7,5 +7,5 @@ import (
 
 func (api *Routes) setUpUsersRoutes() {
 	apiAuth := api.routerGroup.Group("/users")
-	apiAuth.GET("/", middleware.AuthMiddleware, controllers.GetUsers)
+	apiAuth.GET("", middleware.AuthMiddleware, controllers.GetUsers)
 }
