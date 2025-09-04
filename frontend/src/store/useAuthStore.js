@@ -2,7 +2,6 @@ import { create } from "zustand";
 
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
-import { LogOut } from "lucide-react";
 
 export const useAuthStore = create((set) => ({
   authUser: null,

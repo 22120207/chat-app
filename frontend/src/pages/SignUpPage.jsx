@@ -52,19 +52,19 @@ const SignUpPage = () => {
   return (
     <div className="min-h-screen grid lg:grid-cols-2 sm:grid-cols-1 select-none">
       {/* Left side */}
-      <div className="flex flex-col justify-center items-center mt-10">
+      <div className="flex flex-col justify-center items-center mt-15">
         <div className="w-full max-w-md space-y-8 bg-base-200 rounded-2xl py-5 px-7">
           {/* Logo */}
-          <div className="text-center mb-8">
-            <div className="flex flex-col items-center gap-2">
+          <div className="text-center mb-5 lg:mb-8">
+            <div className="flex flex-col items-center gap-1 lg:gap-2">
               <div
                 className="flex justify-center items-center size-12 bg-primary/10 
             hover:bg-primary/40 active:bg-primary/70 rounded-xl transition-colors"
               >
                 <MessageSquare className="size-6 text-primary" />
               </div>
-              <h1 className="text-2xl font-bold">Create Account</h1>
-              <p className="text-base-content/60 text-sm">
+              <h1 className="text-lg md:text-2xl font-bold">Create Account</h1>
+              <p className="text-base-content/60 text-xs md:text-sm">
                 Get started with your free account
               </p>
             </div>
@@ -72,7 +72,7 @@ const SignUpPage = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-4 lg:gap-8">
               {/* Fullname Input */}
               <label className="input w-full">
                 <input
@@ -188,7 +188,7 @@ const SignUpPage = () => {
             </button>
 
             {/* Link to Login */}
-            <p className="text-center text-base-content/60 mt-0.5">
+            <p className="text-center text-base-content/60 mt-0.5 text-sm">
               Already have an account?{" "}
               <Link className="link link-primary" to="/login">
                 Sign In

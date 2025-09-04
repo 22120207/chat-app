@@ -7,7 +7,7 @@ const Navbar = () => {
 
   return (
     <header className="bg-base-100/80 border-b border-base-300 fixed w-full backdrop-blur-lg">
-      <div className="container flex flex-row justify-between items-center gap-2 pt-2 pb-3">
+      <div className="flex flex-row justify-between items-center gap-2 pt-2 pb-3">
         {/*Home Link*/}
         <Link to="/" className="text-center group ml-5">
           <div className="flex flex-row justify-center items-center gap-2">

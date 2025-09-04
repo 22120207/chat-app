@@ -55,8 +55,8 @@ const LoginPage = () => {
               >
                 <MessageSquare className="size-6 text-primary" />
               </div>
-              <h1 className="text-2xl font-bold">Welcome Back!</h1>
-              <p className="text-base-content/60 text-sm">
+              <h1 className="text-lg md:text-2xl font-bold">Welcome Back!</h1>
+              <p className="text-base-content/60 text-xs md:text-sm">
                 Sign in to your account
               </p>
             </div>
@@ -123,7 +123,7 @@ const LoginPage = () => {
             </button>
 
             {/* Link to Login */}
-            <p className="text-center text-base-content/60 mt-0.5">
+            <p className="text-center text-base-content/60 mt-0.5 text-sm">
               Don't have an account?{" "}
               <Link className="link link-primary" to="/signup">
                 Sign Up

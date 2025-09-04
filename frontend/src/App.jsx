@@ -7,14 +7,17 @@ import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/ProfilePage";
 
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
-
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 
+import { useAuthStore } from "./store/useAuthStore";
+import { useThemeStore } from "./store/useThemeStore";
+
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
+
+  const { theme } = useThemeStore();
 
   useEffect(() => {
     checkAuth();
@@ -28,7 +31,7 @@ const App = () => {
     );
 
   return (
-    <div>
+    <div data-theme={theme}>
       <BrowserRouter>
         <Navbar />
 
