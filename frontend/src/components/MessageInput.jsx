@@ -4,7 +4,7 @@ import { Send } from "lucide-react";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
-  const { sendMessage } = useChatStore();
+  const { selectedUser, sendMessage } = useChatStore();
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -12,6 +12,7 @@ const MessageInput = () => {
 
     try {
       await sendMessage({
+        receiverId: selectedUser.id,
         message: text.trim(),
       });
 

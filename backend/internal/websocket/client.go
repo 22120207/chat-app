@@ -1,20 +1,23 @@
 package websocket
 
 import (
-	"chat-app-backend/internal/controllers"
 	"chat-app-backend/internal/models"
 	"encoding/json"
 	"errors"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
+    ReadBufferSize:  1024,
+    WriteBufferSize: 1024,
+    CheckOrigin: func(r *http.Request) bool {
+        origin := r.Header.Get("Origin")
+        return origin == "http://localhost:5173"
+    },
 }
 
 type ClientWS struct {
@@ -29,52 +32,26 @@ func (c *ClientWS) readPump(hub *Hub) {
 		c.conn.Close()
 	}()
 
-	senderId, err := bson.ObjectIDFromHex(c.id)
-	if err != nil {
-		log.Printf("Invalid receiver ID: %v", err)
-		return
-	}
-
 	for {
 		_, rawMsg, err := c.conn.ReadMessage()
 		if err != nil {
 			break
 		}
 
-		var incoming struct {
-			ReceiverID string `json:"receiverId"`
-			Message    string `json:"message"`
-		}
+		var incoming models.Message
 		if err := json.Unmarshal(rawMsg, &incoming); err != nil {
 			log.Printf("Error in unmarshal message: %v", err)
 			continue
 		}
 
-		receiverObjID, err := bson.ObjectIDFromHex(incoming.ReceiverID)
+		jsonMsg, err := json.Marshal(incoming)
 		if err != nil {
-			log.Printf("Invalid receiver ID: %v", err)
-			continue
+			log.Printf("Error in marshal incoming websocket message: %v", err)
 		}
-
-		// Save to MongoDB
-		msg, err := controllers.CreateMessage(senderId, receiverObjID, incoming.Message)
-		if err != nil {
-			log.Printf("Error saving message: %v", err)
-			continue
-		}
-
-		jsonMsg, err := json.Marshal(msg)
-		if err != nil {
-			log.Printf("Error marshaling message: %v", err)
-			continue
-		}
-
-		// Echo back to sender
-		c.send <- jsonMsg
 
 		// Send to receiver if online
 		hub.mu.RLock()
-		receiver, ok := hub.clients[receiverObjID.Hex()]
+		receiver, ok := hub.clients[incoming.ReceiverID.Hex()]
 		hub.mu.RUnlock()
 		if ok {
 			receiver.send <- jsonMsg

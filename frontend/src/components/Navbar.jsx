@@ -1,9 +1,18 @@
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
+import { useChatStore } from "../store/useChatStore";
 import { LogOut, MessageSquare, Settings, User } from "lucide-react";
 
 const Navbar = () => {
   const { logout, authUser } = useAuthStore();
+
+  const { disconnectSocket } = useChatStore();
+
+  const handleLogout = () => {
+    logout();
+
+    disconnectSocket();
+  };
 
   return (
     <header className="bg-base-100/80 border-b border-base-300 fixed w-full backdrop-blur-lg">
@@ -44,7 +53,7 @@ const Navbar = () => {
 
           {/*Logout Link*/}
           {authUser && (
-            <button className="btn btn-soft" onClick={logout}>
+            <button className="btn btn-soft" onClick={handleLogout}>
               <LogOut className="size-3" />
               <span className="text-xs">Logout</span>
             </button>

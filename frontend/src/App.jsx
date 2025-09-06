@@ -12,16 +12,19 @@ import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 
 import { useAuthStore } from "./store/useAuthStore";
+import { useChatStore } from "./store/useChatStore";
 import { useThemeStore } from "./store/useThemeStore";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
 
+  const { connectSocket } = useChatStore();
+
   const { theme } = useThemeStore();
 
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+    checkAuth(connectSocket);
+  }, [checkAuth, connectSocket]);
 
   if (isCheckingAuth && !authUser)
     return (
